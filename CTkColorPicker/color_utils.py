@@ -57,7 +57,7 @@ def update_colors(
     brightness: int,
     default_rgb: Sequence[int],
     slider: any,
-    label: any,
+    widget: any,
     command: Callable[[str], None] | None = None,
     get_callback: Callable[[], str] | None = None,
 ) -> tuple[list[int], str]:
@@ -71,20 +71,22 @@ def update_colors(
 
     slider.configure(progress_color=hex_color)
 
-    if hasattr(label, "delete") and hasattr(label, "insert"):
-        label.configure(fg_color=hex_color)
-        label.delete(0, "end")
-        label.insert(0, hex_color)
+    if hasattr(widget, "delete"):
+        widget.configure(fg_color=hex_color)
+        widget.delete(0, "end")
+        widget.insert(0, hex_color)
     else:
-        label.configure(fg_color=hex_color)
-        label.configure(text=str(hex_color))
+        try:
+            widget.configure(fg_color=hex_color, text=str(hex_color))
+        except Exception:
+            widget.configure(fg_color=hex_color)
 
     if brightness < 70:
-        label.configure(text_color="white")
+        widget.configure(text_color="white")
     else:
-        label.configure(text_color="black")
-    if str(label._fg_color) == "black":
-        label.configure(text_color="white")
+        widget.configure(text_color="black")
+    if str(widget._fg_color) == "black":
+        widget.configure(text_color="white")
 
     if command and get_callback:
         command(get_callback())
