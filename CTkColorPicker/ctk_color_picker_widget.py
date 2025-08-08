@@ -4,12 +4,12 @@
 import tkinter
 import customtkinter
 from PIL import Image, ImageTk
-import sys
 import os
 import math
 from typing import Any, Callable
 
 PATH = os.path.dirname(os.path.realpath(__file__))
+
 
 class CTkColorPicker(customtkinter.CTkFrame):
     """A color picker widget with a color wheel and brightness slider."""
@@ -53,42 +53,57 @@ class CTkColorPicker(customtkinter.CTkFrame):
         """
 
         super().__init__(master=master, corner_radius=corner_radius)
-        
-        WIDTH = width if width>=200 else 200
-        HEIGHT = WIDTH + 150
+
+        WIDTH = width if width >= 200 else 200
         self.image_dimension = int(self._apply_widget_scaling(WIDTH - 100))
         self.target_dimension = int(self._apply_widget_scaling(20))
         self.lift()
 
-        self.after(10)       
-        self.default_hex_color = "#ffffff"  
+        self.after(10)
+        self.default_hex_color = "#ffffff"
         self.default_rgb = [255, 255, 255]
         self.rgb_color = self.default_rgb[:]
-        
-        self.fg_color = self._apply_appearance_mode(self._fg_color) if fg_color is None else fg_color
+
+        self.fg_color = (
+            self._apply_appearance_mode(self._fg_color)
+            if fg_color is None
+            else fg_color
+        )
         self.corner_radius = corner_radius
-        
+
         self.command = command
-            
-        self.slider_border = 10 if slider_border>=10 else slider_border
-        
+
+        self.slider_border = 10 if slider_border >= 10 else slider_border
+
         self.configure(fg_color=self.fg_color)
-          
-        self.canvas = tkinter.Canvas(self, height=self.image_dimension, width=self.image_dimension, highlightthickness=0, bg=self.fg_color)
+
+        self.canvas = tkinter.Canvas(
+            self,
+            height=self.image_dimension,
+            width=self.image_dimension,
+            highlightthickness=0,
+            bg=self.fg_color,
+        )
         self.canvas.bind("<B1-Motion>", self.on_mouse_drag)
 
-        self.img1 = Image.open(os.path.join(PATH, 'color_wheel.png')).resize((self.image_dimension, self.image_dimension), Image.Resampling.LANCZOS)
-        self.img2 = Image.open(os.path.join(PATH, 'target.png')).resize((self.target_dimension, self.target_dimension), Image.Resampling.LANCZOS)
+        self.img1 = Image.open(os.path.join(PATH, "color_wheel.png")).resize(
+            (self.image_dimension, self.image_dimension), Image.Resampling.LANCZOS
+        )
+        self.img2 = Image.open(os.path.join(PATH, "target.png")).resize(
+            (self.target_dimension, self.target_dimension), Image.Resampling.LANCZOS
+        )
 
         self.wheel = ImageTk.PhotoImage(self.img1)
         self.target = ImageTk.PhotoImage(self.img2)
-        
-        self.canvas.create_image(self.image_dimension/2, self.image_dimension/2, image=self.wheel)
+
+        self.canvas.create_image(
+            self.image_dimension / 2, self.image_dimension / 2, image=self.wheel
+        )
         self.set_initial_color(initial_color)
-        
+
         self.brightness_slider_value = customtkinter.IntVar()
         self.brightness_slider_value.set(255)
-        
+
         self.slider = customtkinter.CTkSlider(
             master=self,
             width=20,
@@ -105,19 +120,28 @@ class CTkColorPicker(customtkinter.CTkFrame):
             orientation=orientation,
             **slider_kwargs,
         )
-        
-        self.label = customtkinter.CTkLabel(master=self, text_color="#000000", width=10, fg_color=self.default_hex_color,
-                                            corner_radius=self.corner_radius, text=self.default_hex_color, wraplength=1)
-        if orientation=="vertical":
-            self.canvas.pack(pady=20, side="left", padx=(10,0))
-            self.slider.pack(fill="y", pady=15, side="right", padx=(0,10-self.slider_border))
+
+        self.label = customtkinter.CTkLabel(
+            master=self,
+            text_color="#000000",
+            width=10,
+            fg_color=self.default_hex_color,
+            corner_radius=self.corner_radius,
+            text=self.default_hex_color,
+            wraplength=1,
+        )
+        if orientation == "vertical":
+            self.canvas.pack(pady=20, side="left", padx=(10, 0))
+            self.slider.pack(
+                fill="y", pady=15, side="right", padx=(0, 10 - self.slider_border)
+            )
             self.label.pack(expand=True, fill="both", padx=10, pady=15)
         else:
             self.label.configure(wraplength=100)
             self.canvas.pack(pady=15, padx=15)
-            self.slider.pack(fill="x", pady=(0,10-self.slider_border), padx=15)
-            self.label.pack(expand=True, fill="both", padx=15, pady=(0,15))
-            
+            self.slider.pack(fill="x", pady=(0, 10 - self.slider_border), padx=15)
+            self.label.pack(expand=True, fill="both", padx=15, pady=(0, 15))
+
     def get(self) -> str:
         """Return the currently selected color as a hexadecimal string."""
 
