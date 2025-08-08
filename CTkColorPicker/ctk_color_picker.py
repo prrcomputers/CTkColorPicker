@@ -132,15 +132,18 @@ class AskColor(customtkinter.CTkToplevel):
         self.canvas.pack(pady=20)
         self.canvas.bind("<B1-Motion>", self.on_mouse_drag)
 
-        self.img1 = Image.open(os.path.join(PATH, "color_wheel.png")).resize(
-            (self.image_dimension, self.image_dimension), Image.Resampling.LANCZOS
-        )
-        self.img2 = Image.open(os.path.join(PATH, "target.png")).resize(
-            (self.target_dimension, self.target_dimension), Image.Resampling.LANCZOS
-        )
-
-        self.wheel = ImageTk.PhotoImage(self.img1)
-        self.target = ImageTk.PhotoImage(self.img2)
+        with Image.open(os.path.join(PATH, "color_wheel.png")) as img:
+            self.img1 = img.resize(
+                (self.image_dimension, self.image_dimension),
+                Image.Resampling.LANCZOS,
+            )
+            self.wheel = ImageTk.PhotoImage(self.img1)
+        with Image.open(os.path.join(PATH, "target.png")) as img:
+            self.img2 = img.resize(
+                (self.target_dimension, self.target_dimension),
+                Image.Resampling.LANCZOS,
+            )
+            self.target = ImageTk.PhotoImage(self.img2)
 
         self.canvas.create_image(
             self.image_dimension / 2, self.image_dimension / 2, image=self.wheel
