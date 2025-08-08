@@ -9,6 +9,8 @@ import os
 import math
 from typing import Any
 
+from .color_utils import projection_on_circle, update_colors as utils_update_colors
+
 PATH = os.path.dirname(os.path.realpath(__file__))
 
 
@@ -261,7 +263,7 @@ class AskColor(customtkinter.CTkToplevel):
         if d_from_center < self.image_dimension / 2:
             self.target_x, self.target_y = x, y
         else:
-            self.target_x, self.target_y = self.projection_on_circle(
+            self.target_x, self.target_y = projection_on_circle(
                 x,
                 y,
                 self.image_dimension / 2,
@@ -271,81 +273,20 @@ class AskColor(customtkinter.CTkToplevel):
 
         self.canvas.create_image(self.target_x, self.target_y, image=self.target)
 
-        self.get_target_color()
         self.update_colors()
-
-    def get_target_color(self) -> None:
-        """Retrieve the RGB color at the current target location."""
-
-        try:
-            self.rgb_color = self.img1.getpixel((self.target_x, self.target_y))
-
-            r = self.rgb_color[0]
-            g = self.rgb_color[1]
-            b = self.rgb_color[2]
-            self.rgb_color = [r, g, b]
-
-        except AttributeError:
-            self.rgb_color = self.default_rgb
 
     def update_colors(self) -> None:
         """Update widget colors based on the current selection and brightness."""
 
-        brightness = self.brightness_slider_value.get()
-
-        self.get_target_color()
-
-        r = int(self.rgb_color[0] * (brightness / 255))
-        g = int(self.rgb_color[1] * (brightness / 255))
-        b = int(self.rgb_color[2] * (brightness / 255))
-
-        self.rgb_color = [r, g, b]
-
-        self.default_hex_color = "#{:02x}{:02x}{:02x}".format(*self.rgb_color)
-
-        self.slider.configure(progress_color=self.default_hex_color)
-        self.label.configure(fg_color=self.default_hex_color)
-
-        self.label.configure(text=str(self.default_hex_color))
-
-        if self.brightness_slider_value.get() < 70:
-            self.label.configure(text_color="white")
-        else:
-            self.label.configure(text_color="black")
-
-        if str(self.label._fg_color) == "black":
-            self.label.configure(text_color="white")
-
-    def projection_on_circle(
-        self,
-        point_x: float,
-        point_y: float,
-        circle_x: float,
-        circle_y: float,
-        radius: float,
-    ) -> tuple[float, float]:
-        """Project a point onto the circumference of a circle.
-
-        Parameters
-        ----------
-        point_x, point_y : float
-            Coordinates of the point to project.
-        circle_x, circle_y : float
-            Center of the circle.
-        radius : float
-            Radius of the circle.
-
-        Returns
-        -------
-        tuple[float, float]
-            Coordinates of the projected point on the circle.
-        """
-
-        angle = math.atan2(point_y - circle_y, point_x - circle_x)
-        projection_x = circle_x + radius * math.cos(angle)
-        projection_y = circle_y + radius * math.sin(angle)
-
-        return projection_x, projection_y
+        self.rgb_color, self.default_hex_color = utils_update_colors(
+            self.img1,
+            getattr(self, "target_x", 0),
+            getattr(self, "target_y", 0),
+            self.brightness_slider_value.get(),
+            self.default_rgb,
+            self.slider,
+            self.label,
+        )
 
     def set_initial_color(self, initial_color: str | None) -> None:
         """Position the target on the wheel to match ``initial_color``.
