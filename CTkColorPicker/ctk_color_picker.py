@@ -134,6 +134,7 @@ class AskColor(customtkinter.CTkToplevel):
             bg=self.fg_color,
         )
         self.canvas.pack(pady=20)
+        self.canvas.bind("<Button-1>", self.on_mouse_drag)
         self.canvas.bind("<B1-Motion>", self.on_mouse_drag)
 
         with Image.open(os.path.join(PATH, "color_wheel.png")) as img:
@@ -251,7 +252,7 @@ class AskColor(customtkinter.CTkToplevel):
         del self.target
 
     def on_mouse_drag(self, event: tkinter.Event) -> None:
-        """Update the target location while the user drags the mouse.
+        """Move the target when the user clicks or drags the mouse.
 
         Parameters
         ----------

@@ -90,6 +90,7 @@ class CTkColorPicker(customtkinter.CTkFrame):
             highlightthickness=0,
             bg=self.fg_color,
         )
+        self.canvas.bind("<Button-1>", self.on_mouse_drag)
         self.canvas.bind("<B1-Motion>", self.on_mouse_drag)
 
         with Image.open(os.path.join(PATH, "color_wheel.png")) as img:
@@ -177,7 +178,7 @@ class CTkColorPicker(customtkinter.CTkFrame):
         del self.target
 
     def on_mouse_drag(self, event: tkinter.Event) -> None:
-        """Update the target while the user drags the mouse over the wheel."""
+        """Move the target when the user clicks or drags on the wheel."""
 
         x = event.x
         y = event.y
