@@ -30,6 +30,18 @@ class DummyWidget:
             self._fg_color = kwargs['fg_color']
 
 
+class DummyEntry(DummyWidget):
+    def __init__(self):
+        super().__init__()
+        self.text = ""
+
+    def delete(self, start, end):
+        self.text = ""
+
+    def insert(self, index, value):
+        self.text = value
+
+
 class DummyImage:
     def __init__(self, color):
         self.color = color
@@ -67,6 +79,15 @@ def test_callback_invoked():
 
     update_colors(img, 0, 0, 255, [0, 0, 0], slider, label, command=callback, get_callback=getter)
     assert received == ['#ff0000']
+
+
+def test_update_colors_entry_widget():
+    img = DummyImage((0, 255, 0))
+    slider, entry = DummyWidget(), DummyEntry()
+    update_colors(img, 0, 0, 255, [0, 0, 0], slider, entry)
+    assert entry.text == '#00ff00'
+    assert entry._fg_color == '#00ff00'
+    assert entry.config['text_color'] == 'black'
 
 
 def test_normalize_hex_color_shorthand():
