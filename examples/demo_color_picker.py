@@ -6,7 +6,7 @@ from CTkColorPicker import AskColor, CTkColorPicker
 
 
 def open_modal_picker():
-    picker = AskColor()
+    picker = AskColor(initial_color=modal_swatch.cget("fg_color"))
     color = picker.get()
     if color:
         modal_swatch.configure(fg_color=color)
@@ -39,12 +39,15 @@ if __name__ == "__main__":
     embedded_frame = ctk.CTkFrame(root)
     embedded_frame.pack(padx=20, pady=10, fill="both", expand=True)
 
+    embedded_swatch = ctk.CTkFrame(embedded_frame, width=30, height=30, fg_color="#ffffff")
     embedded_picker = CTkColorPicker(
-        embedded_frame, width=250, command=update_embedded_picker
+        embedded_frame,
+        width=250,
+        command=update_embedded_picker,
+        initial_color=embedded_swatch.cget("fg_color"),
     )
     embedded_picker.pack(side="left")
 
-    embedded_swatch = ctk.CTkFrame(embedded_frame, width=30, height=30, fg_color="#ffffff")
     embedded_swatch.pack(side="left", padx=10)
     embedded_swatch.pack_propagate(False)
 
