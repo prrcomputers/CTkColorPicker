@@ -8,24 +8,57 @@ from PIL import Image, ImageTk
 import sys
 import os
 import math
+from typing import Any
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 
 class AskColor(customtkinter.CTkToplevel):
+    """Toplevel dialog for selecting a color via a wheel and slider."""
 
-    def __init__(self,
-                 width: int = 300,
-                 title: str = "Choose Color",
-                 initial_color: str = None,
-                 bg_color: str = None,
-                 fg_color: str = None,
-                 button_color: str = None,
-                 button_hover_color: str = None,
-                 text: str = "OK",
-                 corner_radius: int = 24,
-                 slider_border: int = 1,
-                 **button_kwargs):
-    
+    def __init__(
+        self,
+        width: int = 300,
+        title: str = "Choose Color",
+        initial_color: str | None = None,
+        bg_color: str | None = None,
+        fg_color: str | None = None,
+        button_color: str | None = None,
+        button_hover_color: str | None = None,
+        text: str = "OK",
+        corner_radius: int = 24,
+        slider_border: int = 1,
+        **button_kwargs: Any,
+    ) -> None:
+        """Initialize the color picker dialog.
+
+        Parameters
+        ----------
+        width : int
+            Width of the dialog window in pixels. Minimum accepted value is
+            200.
+        title : str
+            Title of the dialog window.
+        initial_color : str | None
+            Starting color in hexadecimal format.
+        bg_color : str | None
+            Background color for the dialog.
+        fg_color : str | None
+            Foreground color of the inner frame.
+        button_color : str | None
+            Fill color of the confirmation button.
+        button_hover_color : str | None
+            Hover color of the confirmation button.
+        text : str
+            Text displayed on the confirmation button.
+        corner_radius : int
+            Corner radius applied to widgets.
+        slider_border : int
+            Border width for the brightness slider.
+        **button_kwargs : Any
+            Additional keyword arguments forwarded to the confirmation
+            button.
+        """
+
         super().__init__()
         
         self.title(title)
@@ -97,12 +130,32 @@ class AskColor(customtkinter.CTkToplevel):
                 
         self.grab_set()
         
-    def get(self):
+    def get(self) -> str | None:
+        """Return the color selected by the user.
+
+        The method blocks until the dialog window is closed and then returns
+        the currently selected color.
+
+        Returns
+        -------
+        str | None
+            Hexadecimal color string or ``None`` if the dialog was closed
+            without selection.
+        """
+
         self._color = self.label._fg_color
         self.master.wait_window(self)
         return self._color
-    
-    def _ok_event(self, event=None):
+
+    def _ok_event(self, event: tkinter.Event | None = None) -> None:
+        """Confirm the selection and close the dialog.
+
+        Parameters
+        ----------
+        event : tkinter.Event | None
+            Optional event object from button or keyboard interaction.
+        """
+
         self._color = self.label._fg_color
         self.grab_release()
         self.destroy()
@@ -110,8 +163,10 @@ class AskColor(customtkinter.CTkToplevel):
         del self.img2
         del self.wheel
         del self.target
-        
-    def _on_closing(self):
+
+    def _on_closing(self) -> None:
+        """Handle the window close event by discarding the selection."""
+
         self._color = None
         self.grab_release()
         self.destroy()
@@ -119,90 +174,154 @@ class AskColor(customtkinter.CTkToplevel):
         del self.img2
         del self.wheel
         del self.target
-        
-    def on_mouse_drag(self, event):
+
+    def on_mouse_drag(self, event: tkinter.Event) -> None:
+        """Update the target location while the user drags the mouse.
+
+        Parameters
+        ----------
+        event : tkinter.Event
+            Event containing the mouse coordinates.
+        """
+
         x = event.x
         y = event.y
         self.canvas.delete("all")
-        self.canvas.create_image(self.image_dimension/2, self.image_dimension/2, image=self.wheel)
-        
-        d_from_center = math.sqrt(((self.image_dimension/2)-x)**2 + ((self.image_dimension/2)-y)**2)
-        
-        if d_from_center < self.image_dimension/2:
+        self.canvas.create_image(
+            self.image_dimension / 2, self.image_dimension / 2, image=self.wheel
+        )
+
+        d_from_center = math.sqrt(
+            ((self.image_dimension / 2) - x) ** 2
+            + ((self.image_dimension / 2) - y) ** 2
+        )
+
+        if d_from_center < self.image_dimension / 2:
             self.target_x, self.target_y = x, y
         else:
-            self.target_x, self.target_y = self.projection_on_circle(x, y, self.image_dimension/2, self.image_dimension/2, self.image_dimension/2 -1)
+            self.target_x, self.target_y = self.projection_on_circle(
+                x,
+                y,
+                self.image_dimension / 2,
+                self.image_dimension / 2,
+                self.image_dimension / 2 - 1,
+            )
 
         self.canvas.create_image(self.target_x, self.target_y, image=self.target)
-        
+
         self.get_target_color()
         self.update_colors()
-  
-    def get_target_color(self):
+
+    def get_target_color(self) -> None:
+        """Retrieve the RGB color at the current target location."""
+
         try:
             self.rgb_color = self.img1.getpixel((self.target_x, self.target_y))
-            
+
             r = self.rgb_color[0]
             g = self.rgb_color[1]
-            b = self.rgb_color[2]    
+            b = self.rgb_color[2]
             self.rgb_color = [r, g, b]
-            
+
         except AttributeError:
             self.rgb_color = self.default_rgb
-    
-    def update_colors(self):
+
+    def update_colors(self) -> None:
+        """Update widget colors based on the current selection and brightness."""
+
         brightness = self.brightness_slider_value.get()
 
         self.get_target_color()
 
-        r = int(self.rgb_color[0] * (brightness/255))
-        g = int(self.rgb_color[1] * (brightness/255))
-        b = int(self.rgb_color[2] * (brightness/255))
-        
+        r = int(self.rgb_color[0] * (brightness / 255))
+        g = int(self.rgb_color[1] * (brightness / 255))
+        b = int(self.rgb_color[2] * (brightness / 255))
+
         self.rgb_color = [r, g, b]
 
         self.default_hex_color = "#{:02x}{:02x}{:02x}".format(*self.rgb_color)
-        
+
         self.slider.configure(progress_color=self.default_hex_color)
         self.label.configure(fg_color=self.default_hex_color)
-        
+
         self.label.configure(text=str(self.default_hex_color))
-        
+
         if self.brightness_slider_value.get() < 70:
             self.label.configure(text_color="white")
         else:
             self.label.configure(text_color="black")
-            
-        if str(self.label._fg_color)=="black":
+
+        if str(self.label._fg_color) == "black":
             self.label.configure(text_color="white")
-            
-    def projection_on_circle(self, point_x, point_y, circle_x, circle_y, radius):
+
+    def projection_on_circle(
+        self,
+        point_x: float,
+        point_y: float,
+        circle_x: float,
+        circle_y: float,
+        radius: float,
+    ) -> tuple[float, float]:
+        """Project a point onto the circumference of a circle.
+
+        Parameters
+        ----------
+        point_x, point_y : float
+            Coordinates of the point to project.
+        circle_x, circle_y : float
+            Center of the circle.
+        radius : float
+            Radius of the circle.
+
+        Returns
+        -------
+        tuple[float, float]
+            Coordinates of the projected point on the circle.
+        """
+
         angle = math.atan2(point_y - circle_y, point_x - circle_x)
         projection_x = circle_x + radius * math.cos(angle)
         projection_y = circle_y + radius * math.sin(angle)
 
         return projection_x, projection_y
-    
-    def set_initial_color(self, initial_color):
+
+    def set_initial_color(self, initial_color: str | None) -> None:
+        """Position the target on the wheel to match ``initial_color``.
+
+        Parameters
+        ----------
+        initial_color : str | None
+            Hexadecimal color string used to initialize the target position.
+        """
+
         # set_initial_color is in beta stage, cannot seek all colors accurately
-        
+
         if initial_color and initial_color.startswith("#"):
             try:
-                r,g,b = tuple(int(initial_color.lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
+                r, g, b = tuple(
+                    int(initial_color.lstrip("#")[i : i + 2], 16)
+                    for i in (0, 2, 4)
+                )
             except ValueError:
                 return
-            
+
             self.default_hex_color = initial_color
             for i in range(0, self.image_dimension):
                 for j in range(0, self.image_dimension):
                     self.rgb_color = self.img1.getpixel((i, j))
-                    if (self.rgb_color[0], self.rgb_color[1], self.rgb_color[2])==(r,g,b):
+                    if (self.rgb_color[0], self.rgb_color[1], self.rgb_color[2]) == (
+                        r,
+                        g,
+                        b,
+                    ):
                         self.canvas.create_image(i, j, image=self.target)
                         self.target_x = i
                         self.target_y = j
                         return
-                    
-        self.canvas.create_image(self.image_dimension/2, self.image_dimension/2, image=self.target)
+
+        self.canvas.create_image(
+            self.image_dimension / 2, self.image_dimension / 2, image=self.target
+        )
         
 if __name__ == "__main__":
     app = AskColor()
