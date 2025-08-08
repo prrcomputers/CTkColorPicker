@@ -284,3 +284,5 @@ class CTkColorPicker(customtkinter.CTkFrame):
         self.canvas.create_image(
             self.image_dimension / 2, self.image_dimension / 2, image=self.target
         )
+        self.target_x = self.image_dimension // 2
+        self.target_y = self.image_dimension // 2
