@@ -4,29 +4,21 @@ from PIL import Image
 import string
 
 
-def normalize_hex_color(value: str) -> str:
-    """Return a normalized ``#rrggbb`` color string or raise ``ValueError``."""
+def normalize_hex(value: str | None) -> str | None:
+    """Return a normalized ``#rrggbb`` color string or ``None`` if invalid."""
 
     if value is None:
-        raise ValueError("No color provided")
+        return None
     value = value.strip().lower()
     if not value:
-        raise ValueError("No color provided")
-    if not value.startswith("#"):
-        value = "#" + value
-    hex_part = value[1:]
-    if len(hex_part) == 3:
-        if all(c in string.hexdigits for c in hex_part):
-            value = "#" + "".join(c * 2 for c in hex_part)
-        else:
-            raise ValueError("Invalid hex digits")
-    elif len(hex_part) == 6:
-        if not all(c in string.hexdigits for c in hex_part):
-            raise ValueError("Invalid hex digits")
-        value = "#" + hex_part
-    else:
-        raise ValueError("Invalid length for hex color")
-    return value
+        return None
+    if value.startswith("#"):
+        value = value[1:]
+    if len(value) == 3 and all(c in string.hexdigits for c in value):
+        return "#" + "".join(c * 2 for c in value)
+    if len(value) == 6 and all(c in string.hexdigits for c in value):
+        return "#" + value
+    return None
 
 
 def projection_on_circle(
