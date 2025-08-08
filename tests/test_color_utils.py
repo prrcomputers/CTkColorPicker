@@ -1,6 +1,7 @@
 import sys
 import types
 from pathlib import Path
+import pytest
 
 # Stub PIL.Image to avoid Pillow dependency
 PIL_module = types.ModuleType('PIL')
@@ -15,7 +16,7 @@ sys.modules['PIL.Image'] = Image_module
 # Add package directory to path without importing package __init__
 sys.path.append(str(Path(__file__).resolve().parents[1] / 'CTkColorPicker'))
 
-from color_utils import update_colors
+from color_utils import update_colors, normalize_hex_color
 
 
 class DummyWidget:
@@ -66,3 +67,20 @@ def test_callback_invoked():
 
     update_colors(img, 0, 0, 255, [0, 0, 0], slider, label, command=callback, get_callback=getter)
     assert received == ['#ff0000']
+
+
+def test_normalize_hex_color_shorthand():
+    assert normalize_hex_color('#fff') == '#ffffff'
+    assert normalize_hex_color('abc') == '#aabbcc'
+
+
+def test_normalize_hex_color_full():
+    assert normalize_hex_color('#123456') == '#123456'
+    assert normalize_hex_color('123456') == '#123456'
+
+
+def test_normalize_hex_color_invalid():
+    with pytest.raises(ValueError):
+        normalize_hex_color('#ff')
+    with pytest.raises(ValueError):
+        normalize_hex_color('ggg')

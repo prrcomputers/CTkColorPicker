@@ -1,6 +1,32 @@
 import math
 from typing import Sequence, Callable, List
 from PIL import Image
+import string
+
+
+def normalize_hex_color(value: str) -> str:
+    """Return a normalized ``#rrggbb`` color string or raise ``ValueError``."""
+
+    if value is None:
+        raise ValueError("No color provided")
+    value = value.strip().lower()
+    if not value:
+        raise ValueError("No color provided")
+    if not value.startswith("#"):
+        value = "#" + value
+    hex_part = value[1:]
+    if len(hex_part) == 3:
+        if all(c in string.hexdigits for c in hex_part):
+            value = "#" + "".join(c * 2 for c in hex_part)
+        else:
+            raise ValueError("Invalid hex digits")
+    elif len(hex_part) == 6:
+        if not all(c in string.hexdigits for c in hex_part):
+            raise ValueError("Invalid hex digits")
+        value = "#" + hex_part
+    else:
+        raise ValueError("Invalid length for hex color")
+    return value
 
 
 def projection_on_circle(
@@ -44,8 +70,14 @@ def update_colors(
     hex_color = "#{:02x}{:02x}{:02x}".format(*rgb_color)
 
     slider.configure(progress_color=hex_color)
-    label.configure(fg_color=hex_color)
-    label.configure(text=str(hex_color))
+
+    if hasattr(label, "delete") and hasattr(label, "insert"):
+        label.configure(fg_color=hex_color)
+        label.delete(0, "end")
+        label.insert(0, hex_color)
+    else:
+        label.configure(fg_color=hex_color)
+        label.configure(text=str(hex_color))
 
     if brightness < 70:
         label.configure(text_color="white")

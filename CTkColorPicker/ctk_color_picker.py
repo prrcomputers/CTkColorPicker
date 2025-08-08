@@ -9,7 +9,11 @@ import os
 import math
 from typing import Any
 
-from .color_utils import projection_on_circle, update_colors as utils_update_colors
+from .color_utils import (
+    projection_on_circle,
+    update_colors as utils_update_colors,
+    normalize_hex_color,
+)
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 
@@ -171,15 +175,18 @@ class AskColor(customtkinter.CTkToplevel):
         )
         self.slider.pack(fill="both", pady=(0, 15), padx=20 - self.slider_border)
 
-        self.label = customtkinter.CTkLabel(
+        self.entry = customtkinter.CTkEntry(
             master=self.frame,
             text_color="#000000",
             height=50,
             fg_color=self.default_hex_color,
             corner_radius=self.corner_radius,
-            text=self.default_hex_color,
+            justify="center",
         )
-        self.label.pack(fill="both", padx=10)
+        self.entry.insert(0, self.default_hex_color)
+        self.entry.bind("<FocusOut>", self.apply_hex_input)
+        self.entry.bind("<Return>", self.apply_hex_input)
+        self.entry.pack(fill="both", padx=10)
 
         self.button = customtkinter.CTkButton(
             master=self.frame,
@@ -193,7 +200,7 @@ class AskColor(customtkinter.CTkToplevel):
         )
         self.button.pack(fill="both", padx=10, pady=20)
 
-        self.after(150, lambda: self.label.focus())
+        self.after(150, lambda: self.entry.focus())
 
         self.grab_set()
 
@@ -210,7 +217,7 @@ class AskColor(customtkinter.CTkToplevel):
             without selection.
         """
 
-        self._color = self.label._fg_color
+        self._color = self.default_hex_color
         self.master.wait_window(self)
         return self._color
 
@@ -223,7 +230,8 @@ class AskColor(customtkinter.CTkToplevel):
             Optional event object from button or keyboard interaction.
         """
 
-        self._color = self.label._fg_color
+        self.apply_hex_input()
+        self._color = self.default_hex_color
         self.grab_release()
         self.destroy()
         del self.img1
@@ -288,8 +296,38 @@ class AskColor(customtkinter.CTkToplevel):
             self.brightness_slider_value.get(),
             self.default_rgb,
             self.slider,
-            self.label,
+            self.entry,
         )
+
+    def apply_hex_input(self, event: tkinter.Event | None = None) -> None:
+        """Validate and apply the hex color entered by the user."""
+
+        value = self.entry.get().strip()
+        try:
+            normalized = normalize_hex_color(value)
+        except ValueError:
+            self.entry.delete(0, "end")
+            self.entry.insert(0, self.default_hex_color)
+            self.entry.configure(fg_color=self.default_hex_color)
+            self.slider.configure(progress_color=self.default_hex_color)
+            self.brightness_slider_value.set(255)
+            self.entry.focus()
+            return
+
+        r, g, b = tuple(int(normalized[i : i + 2], 16) for i in (1, 3, 5))
+        self.default_hex_color = normalized
+        self.rgb_color = [r, g, b]
+        self.entry.delete(0, "end")
+        self.entry.insert(0, normalized)
+        self.entry.configure(fg_color=normalized)
+        self.slider.configure(progress_color=normalized)
+        self.brightness_slider_value.set(255)
+
+        brightness = 0.299 * r + 0.587 * g + 0.114 * b
+        if brightness < 70 or normalized == "#000000":
+            self.entry.configure(text_color="white")
+        else:
+            self.entry.configure(text_color="black")
 
     def set_initial_color(self, initial_color: str | None) -> None:
         """Position the target on the wheel to match ``initial_color``.
