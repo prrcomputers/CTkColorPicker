@@ -16,7 +16,7 @@ sys.modules['PIL.Image'] = Image_module
 # Add package directory to path without importing package __init__
 sys.path.append(str(Path(__file__).resolve().parents[1] / 'CTkColorPicker'))
 
-from color_utils import update_colors, normalize_hex_color
+from color_utils import update_colors, normalize_hex
 
 
 class DummyWidget:
@@ -90,18 +90,15 @@ def test_update_colors_entry_widget():
     assert entry.config['text_color'] == 'black'
 
 
-def test_normalize_hex_color_shorthand():
-    assert normalize_hex_color('#fff') == '#ffffff'
-    assert normalize_hex_color('abc') == '#aabbcc'
+def test_normalize_hex_valid():
+    assert normalize_hex('#fff') == '#ffffff'
+    assert normalize_hex('abc') == '#aabbcc'
+    assert normalize_hex('#123456') == '#123456'
+    assert normalize_hex('123456') == '#123456'
 
 
-def test_normalize_hex_color_full():
-    assert normalize_hex_color('#123456') == '#123456'
-    assert normalize_hex_color('123456') == '#123456'
-
-
-def test_normalize_hex_color_invalid():
-    with pytest.raises(ValueError):
-        normalize_hex_color('#ff')
-    with pytest.raises(ValueError):
-        normalize_hex_color('ggg')
+def test_normalize_hex_invalid():
+    assert normalize_hex('#ff') is None
+    assert normalize_hex('ggg') is None
+    assert normalize_hex('') is None
+    assert normalize_hex(None) is None

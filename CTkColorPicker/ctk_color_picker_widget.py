@@ -11,7 +11,7 @@ from typing import Any, Callable
 from .color_utils import (
     projection_on_circle,
     update_colors as utils_update_colors,
-    normalize_hex_color,
+    normalize_hex,
 )
 
 PATH = os.path.dirname(os.path.realpath(__file__))
@@ -225,9 +225,8 @@ class CTkColorPicker(customtkinter.CTkFrame):
         """Validate and apply the hex color entered by the user."""
 
         value = self.entry.get().strip()
-        try:
-            normalized = normalize_hex_color(value)
-        except ValueError:
+        normalized = normalize_hex(value)
+        if normalized is None:
             self.entry.delete(0, "end")
             self.entry.insert(0, self.default_hex_color)
             self.entry.configure(fg_color=self.default_hex_color)
