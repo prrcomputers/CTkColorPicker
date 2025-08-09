@@ -6,6 +6,7 @@ import customtkinter
 from PIL import Image, ImageTk
 import os
 import math
+import colorsys
 from typing import Any, Callable
 
 from .color_utils import (
@@ -236,13 +237,27 @@ class CTkColorPicker(customtkinter.CTkFrame):
             return
 
         r, g, b = tuple(int(normalized[i : i + 2], 16) for i in (1, 3, 5))
+        h, s, v = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
+        self.brightness_slider_value.set(int(v * 255))
+
+        angle = h * 2 * math.pi
+        radius = s * (self.image_dimension / 2 - 1)
+        self.target_x = self.image_dimension / 2 + radius * math.cos(angle)
+        self.target_y = self.image_dimension / 2 + radius * math.sin(angle)
+
+        self.canvas.delete("all")
+        self.canvas.create_image(
+            self.image_dimension / 2, self.image_dimension / 2, image=self.wheel
+        )
+        self.canvas.create_image(self.target_x, self.target_y, image=self.target)
+
         self.default_hex_color = normalized
+        self.default_rgb = [r, g, b]
         self.rgb_color = [r, g, b]
         self.entry.delete(0, "end")
         self.entry.insert(0, normalized)
         self.entry.configure(fg_color=normalized)
         self.slider.configure(progress_color=normalized)
-        self.brightness_slider_value.set(255)
 
         brightness = 0.299 * r + 0.587 * g + 0.114 * b
         if brightness < 70 or normalized == "#000000":
