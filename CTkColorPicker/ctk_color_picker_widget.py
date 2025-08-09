@@ -215,7 +215,7 @@ class CTkColorPicker(customtkinter.CTkFrame):
             getattr(self, "target_x", 0),
             getattr(self, "target_y", 0),
             self.brightness_slider_value.get(),
-            self.default_rgb[:],
+            self.rgb_color[:],
             self.slider,
             self.entry,
             command=self.command,
