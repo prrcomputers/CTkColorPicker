@@ -50,6 +50,11 @@ class DummyImage:
         return self.color
 
 
+class FailingImage:
+    def getpixel(self, coords):
+        raise ValueError("fail")
+
+
 def test_update_colors_returns_hex_and_rgb():
     img = DummyImage((255, 0, 0))
     slider, label = DummyWidget(), DummyWidget()
@@ -88,6 +93,15 @@ def test_update_colors_entry_widget():
     assert entry.text == '#00ff00'
     assert entry._fg_color == '#00ff00'
     assert entry.config['text_color'] == 'black'
+
+
+def test_update_colors_uses_fallback_on_failure():
+    img = FailingImage()
+    slider, label = DummyWidget(), DummyWidget()
+    last_color = [1, 2, 3]
+    rgb, hex_color = update_colors(img, 0, 0, 255, last_color, slider, label)
+    assert rgb == last_color
+    assert hex_color == '#010203'
 
 
 def test_normalize_hex_valid():

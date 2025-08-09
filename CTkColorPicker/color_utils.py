@@ -78,14 +78,17 @@ def projection_on_circle(
 
 
 def get_target_color(
-    image: Image.Image, target_x: int, target_y: int, default_rgb: Sequence[int]
+    image: Image.Image, target_x: int, target_y: int, rgb_color: Sequence[int]
 ) -> List[int]:
-    """Return the RGB color of ``image`` at the given coordinates."""
+    """Return the RGB color of ``image`` at the given coordinates.
+
+    Falls back to ``rgb_color`` if the pixel cannot be retrieved.
+    """
     try:
         r, g, b = image.getpixel((target_x, target_y))[:3]
         return [r, g, b]
-    except AttributeError:
-        return list(default_rgb)
+    except Exception:
+        return list(rgb_color)
 
 
 def update_colors(
@@ -93,14 +96,17 @@ def update_colors(
     target_x: int,
     target_y: int,
     brightness: int,
-    default_rgb: Sequence[int],
+    rgb_color: Sequence[int],
     slider: any,
     widget: any,
     command: Callable[[str], None] | None = None,
     get_callback: Callable[[], str] | None = None,
 ) -> tuple[list[int], str]:
-    """Update color widgets and return the RGB list and hex color."""
-    rgb_color = get_target_color(image, target_x, target_y, default_rgb)
+    """Update color widgets and return the RGB list and hex color.
+
+    ``rgb_color`` provides the fallback when the target pixel cannot be read.
+    """
+    rgb_color = get_target_color(image, target_x, target_y, rgb_color)
     r = int(rgb_color[0] * (brightness / 255))
     g = int(rgb_color[1] * (brightness / 255))
     b = int(rgb_color[2] * (brightness / 255))
