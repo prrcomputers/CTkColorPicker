@@ -215,7 +215,7 @@ class CTkColorPicker(customtkinter.CTkFrame):
             getattr(self, "target_x", 0),
             getattr(self, "target_y", 0),
             self.brightness_slider_value.get(),
-            self.default_rgb,
+            self.default_rgb[:],
             self.slider,
             self.entry,
             command=self.command,
@@ -252,8 +252,9 @@ class CTkColorPicker(customtkinter.CTkFrame):
         self.canvas.create_image(self.target_x, self.target_y, image=self.target)
 
         self.default_hex_color = normalized
-        self.default_rgb = [r, g, b]
-        self.rgb_color = [r, g, b]
+        rgb = [r, g, b]
+        self.rgb_color = rgb[:]
+        self.default_rgb = rgb[:]
         self.entry.delete(0, "end")
         self.entry.insert(0, normalized)
         self.entry.configure(fg_color=normalized)
@@ -291,8 +292,9 @@ class CTkColorPicker(customtkinter.CTkFrame):
             self.canvas.create_image(self.target_x, self.target_y, image=self.target)
 
             self.default_hex_color = normalized
-            self.default_rgb = [r, g, b]
-            self.rgb_color = [r, g, b]
+            rgb = [r, g, b]
+            self.rgb_color = rgb[:]
+            self.default_rgb = rgb[:]
 
             self.entry.delete(0, "end")
             self.entry.insert(0, normalized)
