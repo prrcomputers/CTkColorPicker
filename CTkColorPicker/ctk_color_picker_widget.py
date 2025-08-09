@@ -82,9 +82,10 @@ class CTkColorPicker(customtkinter.CTkFrame):
         self.slider_border = 10 if slider_border >= 10 else slider_border
 
         self.configure(fg_color=self.fg_color)
+        self.wheel_frame = customtkinter.CTkFrame(self, fg_color="transparent")
 
         self.canvas = tkinter.Canvas(
-            self,
+            self.wheel_frame,
             height=self.image_dimension,
             width=self.image_dimension,
             highlightthickness=0,
@@ -115,7 +116,7 @@ class CTkColorPicker(customtkinter.CTkFrame):
         self.brightness_slider_value.set(255)
 
         self.slider = customtkinter.CTkSlider(
-            master=self,
+            master=self.wheel_frame,
             width=20,
             border_width=self.slider_border,
             button_length=15,
@@ -144,22 +145,20 @@ class CTkColorPicker(customtkinter.CTkFrame):
         self.entry.bind("<Return>", self.apply_hex_input)
 
         if orientation == "vertical":
-            try:
-                self.entry.configure(wraplength=1)
-            except (tkinter.TclError, ValueError):
-                pass
             self.canvas.pack(pady=20, side="left", padx=(10, 0))
             self.slider.pack(
                 fill="y", pady=15, side="right", padx=(0, 10 - self.slider_border)
             )
-            self.entry.pack(expand=True, fill="both", padx=10, pady=15)
+            self.wheel_frame.pack(side="top")
+            self.entry.pack(fill="x", padx=10, pady=(0, 15))
         else:
             try:
                 self.entry.configure(wraplength=100)
             except (tkinter.TclError, ValueError):
                 pass
-            self.canvas.pack(pady=15, padx=15)
-            self.slider.pack(fill="x", pady=(0, 10 - self.slider_border), padx=15)
+            self.canvas.pack(pady=(0, 15))
+            self.slider.pack(fill="x", pady=(0, 10 - self.slider_border))
+            self.wheel_frame.pack(pady=15, padx=15)
             self.entry.pack(expand=True, fill="both", padx=15, pady=(0, 15))
 
     def get(self) -> str:
