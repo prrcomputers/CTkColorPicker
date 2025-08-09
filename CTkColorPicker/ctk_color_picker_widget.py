@@ -146,7 +146,7 @@ class CTkColorPicker(customtkinter.CTkFrame):
         if orientation == "vertical":
             try:
                 self.entry.configure(wraplength=1)
-            except tkinter.TclError:
+            except (tkinter.TclError, ValueError):
                 pass
             self.canvas.pack(pady=20, side="left", padx=(10, 0))
             self.slider.pack(
@@ -156,7 +156,7 @@ class CTkColorPicker(customtkinter.CTkFrame):
         else:
             try:
                 self.entry.configure(wraplength=100)
-            except tkinter.TclError:
+            except (tkinter.TclError, ValueError):
                 pass
             self.canvas.pack(pady=15, padx=15)
             self.slider.pack(fill="x", pady=(0, 10 - self.slider_border), padx=15)
