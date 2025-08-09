@@ -111,8 +111,6 @@ class CTkColorPicker(customtkinter.CTkFrame):
         self.canvas.create_image(
             self.image_dimension / 2, self.image_dimension / 2, image=self.wheel
         )
-        self.set_initial_color(initial_color)
-
         self.brightness_slider_value = customtkinter.IntVar()
         self.brightness_slider_value.set(255)
 
@@ -161,6 +159,8 @@ class CTkColorPicker(customtkinter.CTkFrame):
             self.slider.pack(fill="x", pady=(0, 10 - self.slider_border))
             self.wheel_frame.pack(pady=15, padx=15)
             self.entry.pack(expand=True, fill="both", padx=15, pady=(0, 15))
+
+        self.set_initial_color(initial_color)
 
     def get(self) -> str:
         """Return the currently selected color as a hexadecimal string."""
@@ -270,34 +270,49 @@ class CTkColorPicker(customtkinter.CTkFrame):
 
 
     def set_initial_color(self, initial_color: str | None) -> None:
-        """Position the target to match ``initial_color`` if possible."""
+        """Position the target and widgets to match ``initial_color``."""
 
-        # set_initial_color is in beta stage, cannot seek all colors accurately
+        normalized = normalize_hex(initial_color) if initial_color else None
+        if normalized is not None:
+            r, g, b = tuple(int(normalized[i : i + 2], 16) for i in (1, 3, 5))
+            h, s, v = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
 
-        if initial_color and initial_color.startswith("#"):
-            try:
-                r, g, b = tuple(
-                    int(initial_color.lstrip("#")[i : i + 2], 16) for i in (0, 2, 4)
-                )
-            except ValueError:
-                return
+            self.brightness_slider_value.set(int(v * 255))
 
-            self.default_hex_color = initial_color
-            for i in range(0, self.image_dimension):
-                for j in range(0, self.image_dimension):
-                    self.rgb_color = self.img1.getpixel((i, j))
-                    if (self.rgb_color[0], self.rgb_color[1], self.rgb_color[2]) == (
-                        r,
-                        g,
-                        b,
-                    ):
-                        self.canvas.create_image(i, j, image=self.target)
-                        self.target_x = i
-                        self.target_y = j
-                        return
+            angle = h * 2 * math.pi
+            radius = s * (self.image_dimension / 2 - 1)
+            self.target_x = self.image_dimension / 2 + radius * math.cos(angle)
+            self.target_y = self.image_dimension / 2 + radius * math.sin(angle)
 
+            self.canvas.delete("all")
+            self.canvas.create_image(
+                self.image_dimension / 2, self.image_dimension / 2, image=self.wheel
+            )
+            self.canvas.create_image(self.target_x, self.target_y, image=self.target)
+
+            self.default_hex_color = normalized
+            self.default_rgb = [r, g, b]
+            self.rgb_color = [r, g, b]
+
+            self.entry.delete(0, "end")
+            self.entry.insert(0, normalized)
+            self.entry.configure(fg_color=normalized)
+            self.slider.configure(progress_color=normalized)
+
+            brightness = 0.299 * r + 0.587 * g + 0.114 * b
+            if brightness < 70 or normalized == "#000000":
+                self.entry.configure(text_color="white")
+            else:
+                self.entry.configure(text_color="black")
+
+            if self.command:
+                self.command(self.get())
+            return
+
+        self.target_x = self.image_dimension / 2
+        self.target_y = self.image_dimension / 2
+        self.canvas.delete("all")
         self.canvas.create_image(
-            self.image_dimension / 2, self.image_dimension / 2, image=self.target
+            self.image_dimension / 2, self.image_dimension / 2, image=self.wheel
         )
-        self.target_x = self.image_dimension // 2
-        self.target_y = self.image_dimension // 2
+        self.canvas.create_image(self.target_x, self.target_y, image=self.target)
