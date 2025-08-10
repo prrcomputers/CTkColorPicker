@@ -319,7 +319,7 @@ class AskColor(customtkinter.CTkToplevel):
         h, s, v = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
         self.brightness_slider_value.set(int(v * 255))
 
-        angle = h * 2 * math.pi
+        angle = (h * 2 * math.pi + math.pi / 3) % (2 * math.pi)
         radius = s * (self.image_dimension / 2 - 1)
         self.target_x = self.image_dimension / 2 + radius * math.cos(angle)
         self.target_y = self.image_dimension / 2 - radius * math.sin(angle)
@@ -361,7 +361,7 @@ class AskColor(customtkinter.CTkToplevel):
 
             self.brightness_slider_value.set(int(v * 255))
 
-            angle = h * 2 * math.pi
+            angle = (h * 2 * math.pi + math.pi / 3) % (2 * math.pi)
             radius = s * (self.image_dimension / 2 - 1)
             self.target_x = self.image_dimension / 2 + radius * math.cos(angle)
             self.target_y = self.image_dimension / 2 - radius * math.sin(angle)
