@@ -222,6 +222,34 @@ class CTkColorPicker(customtkinter.CTkFrame):
             get_callback=self.get,
         )
 
+    def _debug_auto_position(
+        self,
+        *,
+        normalized: str | None = None,
+        r: int | None = None,
+        g: int | None = None,
+        b: int | None = None,
+        h: float | None = None,
+        s: float | None = None,
+        v: float | None = None,
+        angle: float | None = None,
+        radius: float | None = None,
+    ) -> None:
+        """Print debug information for automatic reticle positioning."""
+
+        print("Reticle auto-position debug:")
+        if normalized is not None:
+            print(f"  hex: {normalized}")
+        if None not in (r, g, b):
+            print(f"  RGB: ({r}, {g}, {b})")
+        if None not in (h, s, v):
+            print(f"  HSV: ({h}, {s}, {v})")
+        if angle is not None and radius is not None:
+            print(f"  angle: {angle}, radius: {radius}")
+        print(f"  target: ({self.target_x}, {self.target_y})")
+        pixel = self.img1.getpixel((int(self.target_x), int(self.target_y)))
+        print(f"  wheel pixel: {pixel}")
+
     def apply_hex_input(self, event: tkinter.Event | None = None) -> None:
         """Validate and apply the hex color entered by the user."""
 
@@ -250,6 +278,18 @@ class CTkColorPicker(customtkinter.CTkFrame):
             self.image_dimension / 2, self.image_dimension / 2, image=self.wheel
         )
         self.canvas.create_image(self.target_x, self.target_y, image=self.target)
+
+        self._debug_auto_position(
+            normalized=normalized,
+            r=r,
+            g=g,
+            b=b,
+            h=h,
+            s=s,
+            v=v,
+            angle=angle,
+            radius=radius,
+        )
 
         self.default_hex_color = normalized
         rgb = [r, g, b]
@@ -291,6 +331,18 @@ class CTkColorPicker(customtkinter.CTkFrame):
             )
             self.canvas.create_image(self.target_x, self.target_y, image=self.target)
 
+            self._debug_auto_position(
+                normalized=normalized,
+                r=r,
+                g=g,
+                b=b,
+                h=h,
+                s=s,
+                v=v,
+                angle=angle,
+                radius=radius,
+            )
+
             self.default_hex_color = normalized
             rgb = [r, g, b]
             self.rgb_color = rgb[:]
@@ -318,3 +370,5 @@ class CTkColorPicker(customtkinter.CTkFrame):
             self.image_dimension / 2, self.image_dimension / 2, image=self.wheel
         )
         self.canvas.create_image(self.target_x, self.target_y, image=self.target)
+
+        self._debug_auto_position()
