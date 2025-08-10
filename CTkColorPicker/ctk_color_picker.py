@@ -322,7 +322,7 @@ class AskColor(customtkinter.CTkToplevel):
         angle = h * 2 * math.pi
         radius = s * (self.image_dimension / 2 - 1)
         self.target_x = self.image_dimension / 2 + radius * math.cos(angle)
-        self.target_y = self.image_dimension / 2 + radius * math.sin(angle)
+        self.target_y = self.image_dimension / 2 - radius * math.sin(angle)
 
         self.canvas.delete("all")
         self.canvas.create_image(
@@ -364,7 +364,7 @@ class AskColor(customtkinter.CTkToplevel):
             angle = h * 2 * math.pi
             radius = s * (self.image_dimension / 2 - 1)
             self.target_x = self.image_dimension / 2 + radius * math.cos(angle)
-            self.target_y = self.image_dimension / 2 + radius * math.sin(angle)
+            self.target_y = self.image_dimension / 2 - radius * math.sin(angle)
 
             self.canvas.delete("all")
             self.canvas.create_image(
