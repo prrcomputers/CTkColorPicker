@@ -8,8 +8,8 @@ import bisect
 TAU = 2 * math.pi
 """Full circle constant ``2π`` used for angle calculations."""
 
-HUE_OFFSET = math.pi / 6
-"""Hue offset applied to align wheel coordinates with hex colors."""
+HUE_OFFSET = 0
+"""Legacy hue offset (no longer applied)."""
 
 
 def normalize_hex(value: str | None) -> str | None:
@@ -75,7 +75,7 @@ def update_colors(
     dy = cy - target_y  # invert y-axis for cartesian coordinates
 
     angle = math.atan2(dy, dx)
-    h_val = ((angle - HUE_OFFSET) % TAU) / TAU
+    h_val = (angle % TAU) / TAU
 
     radius = math.sqrt(dx * dx + dy * dy)
     max_radius = min(cx, cy) - 1

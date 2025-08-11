@@ -16,7 +16,6 @@ from .color_utils import (
     build_hue_to_angle_lookup,
     hue_to_angle,
     TAU,
-    HUE_OFFSET,
 )
 
 PATH = os.path.dirname(os.path.realpath(__file__))
@@ -252,7 +251,7 @@ class CTkColorPicker(customtkinter.CTkFrame):
         try:
             angle = hue_to_angle(h, self._hue_lookup)
         except Exception:
-            angle = (h * TAU + HUE_OFFSET) % TAU  # safety fallback
+            angle = (h * TAU) % TAU  # safety fallback
 
         radius = s * (self.image_dimension / 2 - 1)
         self.target_x = self.image_dimension / 2 + radius * math.cos(angle)
@@ -297,7 +296,7 @@ class CTkColorPicker(customtkinter.CTkFrame):
             try:
                 angle = hue_to_angle(h, self._hue_lookup)
             except Exception:
-                angle = (h * TAU + HUE_OFFSET) % TAU  # safety fallback
+                angle = (h * TAU) % TAU  # safety fallback
 
             radius = s * (self.image_dimension / 2 - 1)
             self.target_x = self.image_dimension / 2 + radius * math.cos(angle)
