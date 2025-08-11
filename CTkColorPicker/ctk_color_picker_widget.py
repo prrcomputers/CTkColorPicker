@@ -148,7 +148,7 @@ class CTkColorPicker(customtkinter.CTkFrame):
         if orientation == "vertical":
             self.canvas.pack(pady=20, side="left", padx=(10, 0))
             self.slider.pack(
-                fill="y", pady=15, side="right", padx=(0, 10 - self.slider_border)
+                fill="y", pady=15, side="right", padx=(10, 10 - self.slider_border)
             )
             self.wheel_frame.pack(side="top")
             self.entry.pack(fill="x", padx=10, pady=(0, 15))
