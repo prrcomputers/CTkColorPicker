@@ -161,7 +161,7 @@ class AskColor(customtkinter.CTkToplevel):
             self.image_dimension / 2, self.image_dimension / 2, image=self.wheel
         )
         self.brightness_slider_value = customtkinter.IntVar()
-        self.brightness_slider_value.set(256)
+        self.brightness_slider_value.set(255)
 
         self.slider = customtkinter.CTkSlider(
             master=self.frame,
@@ -170,9 +170,9 @@ class AskColor(customtkinter.CTkToplevel):
             button_length=15,
             progress_color=self.default_hex_color,
             from_=0,
-            to=256,
+            to=255,
             variable=self.brightness_slider_value,
-            number_of_steps=256,
+            number_of_steps=255,
             button_corner_radius=self.corner_radius,
             corner_radius=self.corner_radius,
             button_color=self.button_color,
@@ -297,7 +297,7 @@ class AskColor(customtkinter.CTkToplevel):
     def update_colors(self) -> None:
         """Update widget colors based on the current selection and brightness."""
 
-        brightness = min(self.brightness_slider_value.get(), 255)
+        brightness = self.brightness_slider_value.get()
         self.rgb_color, self.default_hex_color = utils_update_colors(
             self.img1,
             getattr(self, "target_x", 0),
@@ -317,14 +317,14 @@ class AskColor(customtkinter.CTkToplevel):
             self.entry.insert(0, self.default_hex_color)
             self.entry.configure(fg_color=self.default_hex_color)
             self.slider.configure(progress_color=self.default_hex_color)
-            self.brightness_slider_value.set(256)
+            self.brightness_slider_value.set(255)
             self.entry.focus()
             return
 
         r, g, b = tuple(int(normalized[i : i + 2], 16) for i in (1, 3, 5))
         h, s, v = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
         value = int(v * 255)
-        self.brightness_slider_value.set(value if value < 255 else 256)
+        self.brightness_slider_value.set(value)
 
         try:
             angle = hue_to_angle(h, self._hue_lookup)
@@ -371,7 +371,7 @@ class AskColor(customtkinter.CTkToplevel):
             h, s, v = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
 
             value = int(v * 255)
-            self.brightness_slider_value.set(value if value < 255 else 256)
+            self.brightness_slider_value.set(value)
 
             try:
                 angle = hue_to_angle(h, self._hue_lookup)
