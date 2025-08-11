@@ -13,6 +13,8 @@ from .color_utils import (
     projection_on_circle,
     update_colors as utils_update_colors,
     normalize_hex,
+    TAU,
+    HUE_OFFSET,
 )
 
 PATH = os.path.dirname(os.path.realpath(__file__))
@@ -268,7 +270,8 @@ class CTkColorPicker(customtkinter.CTkFrame):
         h, s, v = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
         self.brightness_slider_value.set(int(v * 255))
 
-        angle = (h * 2 * math.pi + math.pi / 3) % (2 * math.pi)
+        angle = (h * TAU + HUE_OFFSET) % TAU
+        # angle = (h * 2 * math.pi + math.pi / 3) % (2 * math.pi)
         radius = s * (self.image_dimension / 2 - 1)
         self.target_x = self.image_dimension / 2 + radius * math.cos(angle)
         self.target_y = self.image_dimension / 2 - radius * math.sin(angle)
@@ -320,7 +323,8 @@ class CTkColorPicker(customtkinter.CTkFrame):
 
             self.brightness_slider_value.set(int(v * 255))
 
-            angle = (h * 2 * math.pi + math.pi / 3) % (2 * math.pi)
+            angle = (h * TAU + HUE_OFFSET) % TAU
+            # angle = (h * 2 * math.pi + math.pi / 3) % (2 * math.pi)
             radius = s * (self.image_dimension / 2 - 1)
             self.target_x = self.image_dimension / 2 + radius * math.cos(angle)
             self.target_y = self.image_dimension / 2 - radius * math.sin(angle)
