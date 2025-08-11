@@ -147,11 +147,9 @@ class AskColor(customtkinter.CTkToplevel):
                 Image.Resampling.LANCZOS,
             )
             self.wheel = ImageTk.PhotoImage(self.img1)
-        
+
         # Build hue angle map
-        # from .color_utils import build_hue_to_angle_lookup, hue_to_angle
         self._hue_lookup = build_hue_to_angle_lookup(self.img1)
-        print("DEBUG: HUE LOOKUP BUILT in", __file__, "size=", len(self._hue_lookup[0]))
 
         with Image.open(os.path.join(PATH, "target.png")) as img:
             self.img2 = img.resize(
@@ -330,10 +328,8 @@ class AskColor(customtkinter.CTkToplevel):
 
         try:
             angle = hue_to_angle(h, self._hue_lookup)
-            print("DEBUG: USING LOOKUP?", hasattr(self, "_hue_lookup"), "angle_deg=", math.degrees(angle))
         except Exception:
             angle = (h * TAU + HUE_OFFSET) % TAU  # safety fallback
-            print("DEBUG: USED FALLBACK")
 
         radius = s * (self.image_dimension / 2 - 1)
         self.target_x = self.image_dimension / 2 + radius * math.cos(angle)
@@ -378,10 +374,8 @@ class AskColor(customtkinter.CTkToplevel):
 
             try:
                 angle = hue_to_angle(h, self._hue_lookup)
-                print("DEBUG: USING LOOKUP?", hasattr(self, "_hue_lookup"), "angle_deg=", math.degrees(angle))
             except Exception:
                 angle = (h * TAU + HUE_OFFSET) % TAU  # safety fallback
-                print("DEBUG: USED FALLBACK")
 
             radius = s * (self.image_dimension / 2 - 1)
             self.target_x = self.image_dimension / 2 + radius * math.cos(angle)
@@ -418,7 +412,3 @@ class AskColor(customtkinter.CTkToplevel):
         )
         self.canvas.create_image(self.target_x, self.target_y, image=self.target)
 
-
-if __name__ == "__main__":
-    app = AskColor()
-    app.mainloop()
