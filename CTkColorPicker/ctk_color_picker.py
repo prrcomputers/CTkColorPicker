@@ -20,6 +20,7 @@ from .color_utils import (
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 
+
 class AskColor(customtkinter.CTkToplevel):
     """Toplevel dialog for selecting a color via a wheel and slider."""
 
@@ -412,4 +413,3 @@ class AskColor(customtkinter.CTkToplevel):
             self.image_dimension / 2, self.image_dimension / 2, image=self.wheel
         )
         self.canvas.create_image(self.target_x, self.target_y, image=self.target)
-

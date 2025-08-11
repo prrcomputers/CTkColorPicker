@@ -1,4 +1,6 @@
-import os, sys
+import os
+import sys
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import customtkinter as ctk
@@ -39,7 +41,9 @@ if __name__ == "__main__":
     embedded_frame = ctk.CTkFrame(root)
     embedded_frame.pack(padx=20, pady=10, fill="both", expand=True)
 
-    embedded_swatch = ctk.CTkFrame(embedded_frame, width=30, height=30, fg_color="#ffffff")
+    embedded_swatch = ctk.CTkFrame(
+        embedded_frame, width=30, height=30, fg_color="#ffffff"
+    )
     embedded_picker = CTkColorPicker(
         embedded_frame,
         width=250,

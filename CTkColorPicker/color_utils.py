@@ -41,6 +41,7 @@ def hsv_to_rgb(h: float, s: float, v: float) -> tuple[int, int, int]:
     r, g, b = colorsys.hsv_to_rgb(h, s, v)
     return int(round(r * 255)), int(round(g * 255)), int(round(b * 255))
 
+
 def projection_on_circle(
     point_x: float, point_y: float, circle_x: float, circle_y: float, radius: float
 ) -> tuple[float, float]:
@@ -60,8 +61,7 @@ def update_colors(
     widget: any,
     command: Callable[[str], None] | None = None,
     get_callback: Callable[[], str] | None = None,
-
-    angle_lookup: tuple[list[float], list[float]] | None = None
+    angle_lookup: tuple[list[float], list[float]] | None = None,
 ) -> tuple[list[int], str]:
     """Update color widgets and return the RGB list and hex color.
 
@@ -115,9 +115,10 @@ def update_colors(
 
     return rgb_color, hex_color
 
-def build_hue_to_angle_lookup(image: Image.Image,
-                              samples: int = 1024,
-                              ring: float = 0.985) -> tuple[list[float], list[float]]:
+
+def build_hue_to_angle_lookup(
+    image: Image.Image, samples: int = 1024, ring: float = 0.985
+) -> tuple[list[float], list[float]]:
     """
     Build a hue→angle lookup from the *resized* wheel.
 
@@ -171,8 +172,7 @@ def build_hue_to_angle_lookup(image: Image.Image,
     return hues_norm, angles
 
 
-def hue_to_angle(h: float,
-                 lookup: tuple[list[float], list[float]]) -> float:
+def hue_to_angle(h: float, lookup: tuple[list[float], list[float]]) -> float:
     """Interpolate wheel angle (0..TAU) for HSV hue h (0..1) using the lookup."""
     hues, angles = lookup
     i = bisect.bisect_left(hues, h)
@@ -187,8 +187,8 @@ def hue_to_angle(h: float,
     # linear interpolation
     return t0 + (t1 - t0) * ((h - h0) / (h1 - h0))
 
-def angle_to_hue(angle: float,
-                 lookup: tuple[list[float], list[float]]) -> float:
+
+def angle_to_hue(angle: float, lookup: tuple[list[float], list[float]]) -> float:
     """Interpolate HSV hue (0..1) for wheel angle a (0..TAU) using the lookup."""
     hues, angles = lookup
     a = angle % TAU

@@ -107,7 +107,7 @@ class CTkColorPicker(customtkinter.CTkFrame):
 
         # Build hue angle map
         self._hue_lookup = build_hue_to_angle_lookup(self.img1)
-        
+
         with Image.open(os.path.join(PATH, "target.png")) as img:
             self.img2 = img.resize(
                 (self.target_dimension, self.target_dimension),
@@ -263,7 +263,6 @@ class CTkColorPicker(customtkinter.CTkFrame):
             self.image_dimension / 2, self.image_dimension / 2, image=self.wheel
         )
         self.canvas.create_image(self.target_x, self.target_y, image=self.target)
-
 
         self.default_hex_color = normalized
         rgb = [r, g, b]
