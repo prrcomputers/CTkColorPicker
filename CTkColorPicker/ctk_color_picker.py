@@ -21,7 +21,6 @@ from .color_utils import (
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 
-
 class AskColor(customtkinter.CTkToplevel):
     """Toplevel dialog for selecting a color via a wheel and slider."""
 
