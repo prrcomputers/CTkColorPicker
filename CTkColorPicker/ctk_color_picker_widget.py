@@ -13,6 +13,8 @@ from .color_utils import (
     projection_on_circle,
     update_colors as utils_update_colors,
     normalize_hex,
+    build_hue_to_angle_lookup,
+    hue_to_angle,
     TAU,
     HUE_OFFSET,
 )
@@ -103,6 +105,12 @@ class CTkColorPicker(customtkinter.CTkFrame):
                 Image.Resampling.LANCZOS,
             )
             self.wheel = ImageTk.PhotoImage(self.img1)
+
+        # Build hue angle map
+        # from .color_utils import build_hue_to_angle_lookup, hue_to_angle
+        self._hue_lookup = build_hue_to_angle_lookup(self.img1)
+        print("DEBUG: HUE LOOKUP BUILT in", __file__, "size=", len(self._hue_lookup[0]))
+        
         with Image.open(os.path.join(PATH, "target.png")) as img:
             self.img2 = img.resize(
                 (self.target_dimension, self.target_dimension),
@@ -270,7 +278,13 @@ class CTkColorPicker(customtkinter.CTkFrame):
         h, s, v = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
         self.brightness_slider_value.set(int(v * 255))
 
-        angle = (h * TAU + HUE_OFFSET) % TAU
+        try:
+            angle = hue_to_angle(h, self._hue_lookup)
+            print("DEBUG: USING LOOKUP?", hasattr(self, "_hue_lookup"), "angle_deg=", math.degrees(angle))
+        except Exception:
+            angle = (h * TAU + HUE_OFFSET) % TAU  # safety fallback
+            print("DEBUG: USED FALLBACK")
+
         radius = s * (self.image_dimension / 2 - 1)
         self.target_x = self.image_dimension / 2 + radius * math.cos(angle)
         self.target_y = self.image_dimension / 2 - radius * math.sin(angle)
@@ -322,7 +336,13 @@ class CTkColorPicker(customtkinter.CTkFrame):
 
             self.brightness_slider_value.set(int(v * 255))
 
-            angle = (h * TAU + HUE_OFFSET) % TAU
+            try:
+                angle = hue_to_angle(h, self._hue_lookup)
+                print("DEBUG: USING LOOKUP?", hasattr(self, "_hue_lookup"), "angle_deg=", math.degrees(angle))
+            except Exception:
+                angle = (h * TAU + HUE_OFFSET) % TAU  # safety fallback
+                print("DEBUG: USED FALLBACK")
+
             radius = s * (self.image_dimension / 2 - 1)
             self.target_x = self.image_dimension / 2 + radius * math.cos(angle)
             self.target_y = self.image_dimension / 2 - radius * math.sin(angle)
