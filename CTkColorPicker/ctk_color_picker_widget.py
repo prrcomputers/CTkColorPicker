@@ -107,7 +107,6 @@ class CTkColorPicker(customtkinter.CTkFrame):
             self.wheel = ImageTk.PhotoImage(self.img1)
 
         # Build hue angle map
-        # from .color_utils import build_hue_to_angle_lookup, hue_to_angle
         self._hue_lookup = build_hue_to_angle_lookup(self.img1)
         
         with Image.open(os.path.join(PATH, "target.png")) as img:
