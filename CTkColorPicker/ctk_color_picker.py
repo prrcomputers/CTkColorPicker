@@ -171,7 +171,7 @@ class AskColor(customtkinter.CTkToplevel):
             from_=0,
             to=255,
             variable=self.brightness_slider_value,
-            number_of_steps=255,
+            number_of_steps=256,
             button_corner_radius=self.corner_radius,
             corner_radius=self.corner_radius,
             button_color=self.button_color,
@@ -304,6 +304,7 @@ class AskColor(customtkinter.CTkToplevel):
             brightness,
             self.slider,
             self.entry,
+            angle_lookup=self._hue_lookup,
         )
 
     def apply_hex_input(self, event: tkinter.Event | None = None) -> None:

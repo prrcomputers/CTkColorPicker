@@ -130,7 +130,7 @@ class CTkColorPicker(customtkinter.CTkFrame):
             from_=0,
             to=255,
             variable=self.brightness_slider_value,
-            number_of_steps=255,
+            number_of_steps=256,
             button_corner_radius=self.corner_radius,
             corner_radius=self.corner_radius,
             command=lambda x: self.update_colors(),
@@ -227,6 +227,7 @@ class CTkColorPicker(customtkinter.CTkFrame):
             self.entry,
             command=self.command,
             get_callback=self.get,
+            angle_lookup=self._hue_lookup,
         )
 
     def apply_hex_input(self, event: tkinter.Event | None = None) -> None:

@@ -60,6 +60,8 @@ def update_colors(
     widget: any,
     command: Callable[[str], None] | None = None,
     get_callback: Callable[[], str] | None = None,
+
+    angle_lookup: tuple[list[float], list[float]] | None = None
 ) -> tuple[list[int], str]:
     """Update color widgets and return the RGB list and hex color.
 
@@ -74,8 +76,11 @@ def update_colors(
     dx = target_x - cx
     dy = cy - target_y  # invert y-axis for cartesian coordinates
 
-    angle = math.atan2(dy, dx)
-    h_val = (angle % TAU) / TAU
+    angle = math.atan2(dy, dx) % TAU
+    if angle_lookup is not None:
+        h_val = angle_to_hue(angle, angle_lookup)
+    else:
+        h_val = (angle % TAU) / TAU
 
     radius = math.sqrt(dx * dx + dy * dy)
     max_radius = min(cx, cy) - 1
@@ -181,3 +186,19 @@ def hue_to_angle(h: float,
         return t0
     # linear interpolation
     return t0 + (t1 - t0) * ((h - h0) / (h1 - h0))
+
+def angle_to_hue(angle: float,
+                 lookup: tuple[list[float], list[float]]) -> float:
+    """Interpolate HSV hue (0..1) for wheel angle a (0..TAU) using the lookup."""
+    hues, angles = lookup
+    a = angle % TAU
+    i = bisect.bisect_left(angles, a)
+    if i <= 0:
+        return hues[0]
+    if i >= len(angles):
+        return hues[-1]
+    a0, a1 = angles[i - 1], angles[i]
+    h0, h1 = hues[i - 1], hues[i]
+    if a1 == a0:
+        return h0
+    return h0 + (h1 - h0) * ((a - a0) / (a1 - a0))
