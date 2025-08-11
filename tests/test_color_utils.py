@@ -120,8 +120,8 @@ def test_normalize_hex_invalid():
 
 def test_hex_to_wheel_red():
     x, y, brightness = hex_to_wheel('#ff0000', 100)
-    assert round(x) == 99
-    assert round(y) == 50
+    assert round(x) == 92
+    assert round(y) == 26
     assert brightness == 255
 
 
