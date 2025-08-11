@@ -47,6 +47,7 @@ def hsv_to_wheel(h: float, s: float, image_dimension: int) -> tuple[float, float
 
     radius = s * (image_dimension / 2 - 1)
     angle = (h * TAU + HUE_OFFSET) % TAU
+    # angle = (h * 2 * math.pi + math.pi / 3) % (2 * math.pi)
     x = image_dimension / 2 + radius * math.cos(angle)
     y = image_dimension / 2 - radius * math.sin(angle)
     return x, y

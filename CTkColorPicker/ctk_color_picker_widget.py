@@ -148,7 +148,7 @@ class CTkColorPicker(customtkinter.CTkFrame):
         if orientation == "vertical":
             self.canvas.pack(pady=20, side="left", padx=(10, 0))
             self.slider.pack(
-                fill="y", pady=15, side="right", padx=(0, 10 - self.slider_border)
+                fill="y", pady=15, side="right", padx=(10, 10 - self.slider_border)
             )
             self.wheel_frame.pack(side="top")
             self.entry.pack(fill="x", padx=10, pady=(0, 15))
@@ -271,6 +271,7 @@ class CTkColorPicker(customtkinter.CTkFrame):
         self.brightness_slider_value.set(int(v * 255))
 
         angle = (h * TAU + HUE_OFFSET) % TAU
+        # angle = (h * 2 * math.pi + math.pi / 3) % (2 * math.pi)
         radius = s * (self.image_dimension / 2 - 1)
         self.target_x = self.image_dimension / 2 + radius * math.cos(angle)
         self.target_y = self.image_dimension / 2 - radius * math.sin(angle)
@@ -323,6 +324,7 @@ class CTkColorPicker(customtkinter.CTkFrame):
             self.brightness_slider_value.set(int(v * 255))
 
             angle = (h * TAU + HUE_OFFSET) % TAU
+            # angle = (h * 2 * math.pi + math.pi / 3) % (2 * math.pi)
             radius = s * (self.image_dimension / 2 - 1)
             self.target_x = self.image_dimension / 2 + radius * math.cos(angle)
             self.target_y = self.image_dimension / 2 - radius * math.sin(angle)
