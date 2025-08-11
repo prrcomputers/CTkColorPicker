@@ -109,7 +109,6 @@ class CTkColorPicker(customtkinter.CTkFrame):
         # Build hue angle map
         # from .color_utils import build_hue_to_angle_lookup, hue_to_angle
         self._hue_lookup = build_hue_to_angle_lookup(self.img1)
-        print("DEBUG: HUE LOOKUP BUILT in", __file__, "size=", len(self._hue_lookup[0]))
         
         with Image.open(os.path.join(PATH, "target.png")) as img:
             self.img2 = img.resize(
@@ -232,34 +231,6 @@ class CTkColorPicker(customtkinter.CTkFrame):
             get_callback=self.get,
         )
 
-    def _debug_auto_position(
-        self,
-        *,
-        normalized: str | None = None,
-        r: int | None = None,
-        g: int | None = None,
-        b: int | None = None,
-        h: float | None = None,
-        s: float | None = None,
-        v: float | None = None,
-        angle: float | None = None,
-        radius: float | None = None,
-    ) -> None:
-        """Print debug information for automatic reticle positioning."""
-
-        print("Reticle auto-position debug:")
-        if normalized is not None:
-            print(f"  hex: {normalized}")
-        if None not in (r, g, b):
-            print(f"  RGB: ({r}, {g}, {b})")
-        if None not in (h, s, v):
-            print(f"  HSV: ({h}, {s}, {v})")
-        if angle is not None and radius is not None:
-            print(f"  angle: {angle}, radius: {radius}")
-        print(f"  target: ({self.target_x}, {self.target_y})")
-        pixel = self.img1.getpixel((int(self.target_x), int(self.target_y)))
-        print(f"  wheel pixel: {pixel}")
-
     def apply_hex_input(self, event: tkinter.Event | None = None) -> None:
         """Validate and apply the hex color entered by the user."""
 
@@ -280,10 +251,8 @@ class CTkColorPicker(customtkinter.CTkFrame):
 
         try:
             angle = hue_to_angle(h, self._hue_lookup)
-            print("DEBUG: USING LOOKUP?", hasattr(self, "_hue_lookup"), "angle_deg=", math.degrees(angle))
         except Exception:
             angle = (h * TAU + HUE_OFFSET) % TAU  # safety fallback
-            print("DEBUG: USED FALLBACK")
 
         radius = s * (self.image_dimension / 2 - 1)
         self.target_x = self.image_dimension / 2 + radius * math.cos(angle)
@@ -295,17 +264,6 @@ class CTkColorPicker(customtkinter.CTkFrame):
         )
         self.canvas.create_image(self.target_x, self.target_y, image=self.target)
 
-        self._debug_auto_position(
-            normalized=normalized,
-            r=r,
-            g=g,
-            b=b,
-            h=h,
-            s=s,
-            v=v,
-            angle=angle,
-            radius=radius,
-        )
 
         self.default_hex_color = normalized
         rgb = [r, g, b]
@@ -325,7 +283,6 @@ class CTkColorPicker(customtkinter.CTkFrame):
         if self.command:
             self.command(self.get())
 
-
     def set_initial_color(self, initial_color: str | None) -> None:
         """Position the target and widgets to match ``initial_color``."""
 
@@ -338,10 +295,8 @@ class CTkColorPicker(customtkinter.CTkFrame):
 
             try:
                 angle = hue_to_angle(h, self._hue_lookup)
-                print("DEBUG: USING LOOKUP?", hasattr(self, "_hue_lookup"), "angle_deg=", math.degrees(angle))
             except Exception:
                 angle = (h * TAU + HUE_OFFSET) % TAU  # safety fallback
-                print("DEBUG: USED FALLBACK")
 
             radius = s * (self.image_dimension / 2 - 1)
             self.target_x = self.image_dimension / 2 + radius * math.cos(angle)
@@ -352,18 +307,6 @@ class CTkColorPicker(customtkinter.CTkFrame):
                 self.image_dimension / 2, self.image_dimension / 2, image=self.wheel
             )
             self.canvas.create_image(self.target_x, self.target_y, image=self.target)
-
-            self._debug_auto_position(
-                normalized=normalized,
-                r=r,
-                g=g,
-                b=b,
-                h=h,
-                s=s,
-                v=v,
-                angle=angle,
-                radius=radius,
-            )
 
             self.default_hex_color = normalized
             rgb = [r, g, b]
@@ -392,5 +335,3 @@ class CTkColorPicker(customtkinter.CTkFrame):
             self.image_dimension / 2, self.image_dimension / 2, image=self.wheel
         )
         self.canvas.create_image(self.target_x, self.target_y, image=self.target)
-
-        self._debug_auto_position()
