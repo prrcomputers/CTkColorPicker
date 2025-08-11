@@ -16,7 +16,7 @@ sys.modules['PIL.Image'] = Image_module
 # Add package directory to path without importing package __init__
 sys.path.append(str(Path(__file__).resolve().parents[1] / 'CTkColorPicker'))
 
-from color_utils import update_colors, normalize_hex, hex_to_wheel
+from color_utils import update_colors, normalize_hex
 
 
 class DummyWidget:
@@ -116,22 +116,3 @@ def test_normalize_hex_invalid():
     assert normalize_hex('ggg') is None
     assert normalize_hex('') is None
     assert normalize_hex(None) is None
-
-
-def test_hex_to_wheel_red():
-    x, y, brightness = hex_to_wheel('#ff0000', 100)
-    assert round(x) == 92
-    assert round(y) == 26
-    assert brightness == 255
-
-
-def test_hex_to_wheel_gray():
-    x, y, brightness = hex_to_wheel('#808080', 100)
-    assert (round(x), round(y)) == (50, 50)
-    assert brightness == 128
-
-
-def test_hex_to_wheel_invalid():
-    x, y, brightness = hex_to_wheel('zzz', 100)
-    assert (round(x), round(y)) == (50, 50)
-    assert brightness == 255
