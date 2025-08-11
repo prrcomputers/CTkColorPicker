@@ -5,6 +5,13 @@ from PIL import Image
 import string
 
 
+TAU = 2 * math.pi
+"""Full circle constant ``2π`` used for angle calculations."""
+
+HUE_OFFSET = math.pi / 3
+"""Hue offset applied to align wheel coordinates with hex colors."""
+
+
 def normalize_hex(value: str | None) -> str | None:
     """Return a normalized ``#rrggbb`` color string or ``None`` if invalid."""
 
@@ -39,7 +46,7 @@ def hsv_to_wheel(h: float, s: float, image_dimension: int) -> tuple[float, float
     """Convert HSV values to ``(x, y)`` wheel coordinates."""
 
     radius = s * (image_dimension / 2 - 1)
-    angle = h * 2 * math.pi
+    angle = (h * TAU + HUE_OFFSET) % TAU
     x = image_dimension / 2 + radius * math.cos(angle)
     y = image_dimension / 2 - radius * math.sin(angle)
     return x, y
