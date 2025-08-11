@@ -1,6 +1,6 @@
 import math
 import colorsys
-from typing import Sequence, Callable, List
+from typing import Callable
 from PIL import Image
 import string
 import bisect
@@ -51,26 +51,11 @@ def projection_on_circle(
     return projection_x, projection_y
 
 
-def get_target_color(
-    image: Image.Image, target_x: int, target_y: int, rgb_color: Sequence[int]
-) -> List[int]:
-    """Return the RGB color of ``image`` at the given coordinates.
-
-    Falls back to ``rgb_color`` if the pixel cannot be retrieved.
-    """
-    try:
-        r, g, b = image.getpixel((target_x, target_y))[:3]
-        return [r, g, b]
-    except Exception:
-        return list(rgb_color)
-
-
 def update_colors(
     image: Image.Image,
     target_x: int,
     target_y: int,
     brightness: int,
-    rgb_color: Sequence[int],
     slider: any,
     widget: any,
     command: Callable[[str], None] | None = None,
@@ -78,13 +63,27 @@ def update_colors(
 ) -> tuple[list[int], str]:
     """Update color widgets and return the RGB list and hex color.
 
-    ``rgb_color`` provides the fallback when the target pixel cannot be read.
+    The color is derived from ``target_x``/``target_y`` relative to the wheel
+    center. Hue and saturation are computed geometrically and combined with the
+    provided ``brightness`` value to form the final RGB color using
+    :func:`colorsys.hsv_to_rgb`.
     """
-    rgb_color = get_target_color(image, target_x, target_y, rgb_color)
-    r = int(rgb_color[0] * (brightness / 255))
-    g = int(rgb_color[1] * (brightness / 255))
-    b = int(rgb_color[2] * (brightness / 255))
-    rgb_color = [r, g, b]
+
+    w, h = image.size
+    cx, cy = w / 2, h / 2
+    dx = target_x - cx
+    dy = cy - target_y  # invert y-axis for cartesian coordinates
+
+    angle = math.atan2(dy, dx)
+    h_val = ((angle - HUE_OFFSET) % TAU) / TAU
+
+    radius = math.sqrt(dx * dx + dy * dy)
+    max_radius = min(cx, cy) - 1
+    s_val = min(radius / max_radius, 1.0)
+    v_val = brightness / 255
+
+    r_f, g_f, b_f = colorsys.hsv_to_rgb(h_val, s_val, v_val)
+    rgb_color = [int(round(r_f * 255)), int(round(g_f * 255)), int(round(b_f * 255))]
     hex_color = "#{:02x}{:02x}{:02x}".format(*rgb_color)
 
     slider.configure(progress_color=hex_color)
