@@ -19,7 +19,8 @@ def update_embedded_picker(color: str):
 
 
 if __name__ == "__main__":
-    ctk.set_appearance_mode("system")
+    ctk.set_appearance_mode("system")              # "light", "dark", or "system"
+    # ctk.set_default_color_theme("dark-blue")     # optional accent theme
 
     root = ctk.CTk()
     root.title("CTkColorPicker Demo")
